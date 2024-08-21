@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">ParcialApi</string>
+
+    <string name="apiKey">7114e8badfce469281d549d368235c6e</string>
+
+    <string name="titleAppBar">Parcial News</string>
+    <string name="navBtnBack">Regresar</string>
+
+    <string name="errorImageNoFound">https://cdn.computerhoy.com/sites/navi.axelspringer.es/public/media/image/2022/05/error-404-2716479.jpg</string>
+</resources>
