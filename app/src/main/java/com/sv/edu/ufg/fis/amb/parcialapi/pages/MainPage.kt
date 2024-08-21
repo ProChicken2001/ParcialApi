@@ -124,7 +124,7 @@ fun MainPage(
         },
         bottomBar = {
             BottomAppBar(
-                containerColor = colorResource(id = R.color.white),
+                containerColor = colorResource(id = R.color.bottomBarBackground),
                 contentColor = colorResource(id = R.color.black),
                 actions = {
                     Row(
