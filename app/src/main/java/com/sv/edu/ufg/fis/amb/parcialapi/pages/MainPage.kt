@@ -57,10 +57,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import com.sv.edu.ufg.fis.amb.parcialapi.R
 import com.sv.edu.ufg.fis.amb.parcialapi.models.Articulo
 import com.sv.edu.ufg.fis.amb.parcialapi.models.ArticuloResponse
+import com.sv.edu.ufg.fis.amb.parcialapi.routes.ROOT_FILTER_PAGE
+import com.sv.edu.ufg.fis.amb.parcialapi.routes.Route
 import com.sv.edu.ufg.fis.amb.parcialapi.ui.theme.ParcialApiTheme
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -70,6 +74,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun MainPage(
     request: ArticuloResponse?,
+    navController: NavHostController
 ){
 
     val pullState = rememberPullToRefreshState()
@@ -148,7 +153,9 @@ fun MainPage(
                             )
                         }
                         IconButton(
-                            onClick = { /*TODO*/ }
+                            onClick = {
+                                navController.navigate(ROOT_FILTER_PAGE)
+                            }
                         ) {
                             Icon(
                                 painter = painterResource(id = R.drawable.filter),
@@ -276,6 +283,6 @@ fun MainPagePreview(){
             )
         )
 
-        MainPage(response)
+        MainPage(response, rememberNavController())
     }
 }

@@ -16,6 +16,7 @@ import com.google.gson.Gson
 import com.sv.edu.ufg.fis.amb.parcialapi.configs.RetrofitConfig
 import com.sv.edu.ufg.fis.amb.parcialapi.models.ArticuloRequest
 import com.sv.edu.ufg.fis.amb.parcialapi.models.ArticuloResponse
+import com.sv.edu.ufg.fis.amb.parcialapi.pages.FilterPage
 import com.sv.edu.ufg.fis.amb.parcialapi.pages.MainPage
 import com.sv.edu.ufg.fis.amb.parcialapi.routes.ART_FILTER_ARGUMENT_KEY
 import com.sv.edu.ufg.fis.amb.parcialapi.routes.Route
@@ -23,6 +24,7 @@ import com.sv.edu.ufg.fis.amb.parcialapi.ui.theme.ParcialApiTheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.util.logging.Filter
 
 @Composable
 fun SetupNavGraph(
@@ -92,12 +94,21 @@ fun SetupNavGraph(
             ParcialApiTheme(
                 dynamicColor = false
             ) {
-                MainPage(request)
+                MainPage(request, navController)
             }
 
 
         }
 
+        composable(
+            route = Route.FilterRoutePage.route
+        ){
+            ParcialApiTheme(
+                dynamicColor = false
+            ) {
+                FilterPage()
+            }
+        }
 
 
     }
