@@ -312,8 +312,8 @@ fun MainPage(
                                     Text(
                                         modifier = Modifier.fillMaxWidth(),
                                         text = item.description,
-                                        fontSize = 20.sp,
-                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 18.sp,
+                                        fontWeight = FontWeight.Light,
                                         maxLines = 2
                                     )
                                     Spacer(modifier = Modifier.height(10.dp))
