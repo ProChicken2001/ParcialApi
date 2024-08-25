@@ -80,7 +80,7 @@ fun MainPage(
     val pullState = rememberPullToRefreshState()
 
     if(pullState.isRefreshing){
-        LaunchedEffect(true) {
+        LaunchedEffect(Unit) {
             delay(1000)
             pullState.endRefresh()
         }

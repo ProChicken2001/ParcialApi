@@ -106,7 +106,7 @@ fun SetupNavGraph(
             ParcialApiTheme(
                 dynamicColor = false
             ) {
-                FilterPage()
+                FilterPage(navController)
             }
         }
 

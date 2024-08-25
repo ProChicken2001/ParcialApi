@@ -6,5 +6,7 @@
     <string name="titleAppBar">Parcial News</string>
     <string name="navBtnBack">Regresar</string>
 
+    <string name="toastTextFiltrar">LAS FECHAS DEBEN ESTAR EN EL RANGO, 2024/7/25 - ACTUAL</string>
+
     <string name="errorImageNoFound">https://cdn.computerhoy.com/sites/navi.axelspringer.es/public/media/image/2022/05/error-404-2716479.jpg</string>
 </resources>
