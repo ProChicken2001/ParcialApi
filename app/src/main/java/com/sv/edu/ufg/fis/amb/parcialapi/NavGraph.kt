@@ -42,7 +42,7 @@ fun SetupNavGraph(
             val filterDataJson = it.arguments?.getString(ART_FILTER_ARGUMENT_KEY)
             val filterRequest = Gson().fromJson(filterDataJson, ArticuloRequest::class.java)
 
-            var request by remember {
+            var response by remember {
                 mutableStateOf(ArticuloResponse(emptyList()))
             }
 
@@ -50,7 +50,7 @@ fun SetupNavGraph(
 
                 LaunchedEffect(Unit) {
                     CoroutineScope(Dispatchers.IO).launch {
-                        val response = RetrofitConfig
+                        val apiResponse = RetrofitConfig
                             .api
                             .getNews(
                                 filterRequest.q,
@@ -60,9 +60,9 @@ fun SetupNavGraph(
                                 getString(context, R.string.apiKey)
                             )
 
-                        if(response.isSuccessful){
-                            response.body()?.let {
-                                request = it
+                        if(apiResponse.isSuccessful){
+                            apiResponse.body()?.let {
+                                response = it
                             }
                         }else{
                             Log.e("NO FOUND", "NO HAY NADA -----------------------------")
@@ -73,16 +73,17 @@ fun SetupNavGraph(
                 LaunchedEffect(Unit) {
 
                     CoroutineScope(Dispatchers.IO).launch {
-                        val response = RetrofitConfig
+                        val apiResponse = RetrofitConfig
                             .api
                             .getNews(
                                 q = "news",
+                                language = "es",
                                 apiKey = getString(context, R.string.apiKey)
                             )
 
-                        if(response.isSuccessful){
-                            response.body()?.let {
-                                request = it
+                        if(apiResponse.isSuccessful){
+                            apiResponse.body()?.let {
+                                response = it
                             }
                         }else{
                             Log.e("NO FOUND", "NO HAY NADA -----------------------------")
@@ -94,7 +95,7 @@ fun SetupNavGraph(
             ParcialApiTheme(
                 dynamicColor = false
             ) {
-                MainPage(request, navController)
+                MainPage(response = response, request = filterRequest, navController = navController)
             }
 
 

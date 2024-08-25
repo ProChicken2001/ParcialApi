@@ -1,5 +1,6 @@
 package com.sv.edu.ufg.fis.amb.parcialapi.pages
 
+import android.app.Activity
 import android.content.Context
 import android.util.Log
 import android.widget.Space
@@ -48,71 +49,92 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.focusModifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat.getString
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import com.sv.edu.ufg.fis.amb.parcialapi.R
+import com.sv.edu.ufg.fis.amb.parcialapi.configs.RetrofitConfig
 import com.sv.edu.ufg.fis.amb.parcialapi.models.Articulo
+import com.sv.edu.ufg.fis.amb.parcialapi.models.ArticuloRequest
 import com.sv.edu.ufg.fis.amb.parcialapi.models.ArticuloResponse
 import com.sv.edu.ufg.fis.amb.parcialapi.routes.ROOT_FILTER_PAGE
 import com.sv.edu.ufg.fis.amb.parcialapi.routes.Route
 import com.sv.edu.ufg.fis.amb.parcialapi.ui.theme.ParcialApiTheme
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Delay
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainPage(
-    request: ArticuloResponse?,
+    response: ArticuloResponse?,
+    request: ArticuloRequest?,
     navController: NavHostController
 ){
-
+    val context = LocalContext.current
     val pullState = rememberPullToRefreshState()
+    var newResponse by remember {
+        mutableStateOf<ArticuloResponse?>(null)
+    }
+
+    var articulos by remember {
+        mutableStateOf(response?.articles ?: emptyList())
+    }
+
+    LaunchedEffect(response) {
+        articulos = response?.articles ?: emptyList()
+    }
 
     if(pullState.isRefreshing){
         LaunchedEffect(Unit) {
-            delay(1000)
+            val apiResponse = withContext(Dispatchers.IO){
+                if(request != null){
+                    RetrofitConfig.api
+                        .getNews(
+                            q = request.q,
+                            from = request.from,
+                            to = request.to,
+                            language = if(request.language == "") "es" else request.language,
+                            apiKey = getString(context, R.string.apiKey)
+                        )
+                }else{
+                    RetrofitConfig.api
+                        .getNews(
+                            q = "news",
+                            language = "es",
+                            apiKey = getString(context, R.string.apiKey)
+                        )
+                }
+            }
+
+            if(apiResponse.isSuccessful){
+                apiResponse.body()?.let {
+                    newResponse = it
+                }
+
+                articulos = newResponse?.articles ?: emptyList()
+            }
+
+
             pullState.endRefresh()
         }
-    }
-
-    var articulos = request?.articles
-
-    articulos = articulos?.filter {
-        it.title != "[Removed]"
-    }?.onEach {
-        item ->
-            if(item.author == null){
-                item.author = "No author"
-            }
-            if(item.title == null){
-                item.title = "Title not found"
-            }
-            if(item.description == null){
-                item.description = "Description not found"
-            }
-            if (item.url == null){
-                item.url = "url not found"
-            }
-            if(item.content == null){
-                item.content = "Content not found"
-            }
-            if(item.publishedAt == null){
-                item.publishedAt = "Date not found"
-            }
-            if(item.urlToImage == null){
-                item.urlToImage = stringResource(id = R.string.errorImageNoFound)
-            }
     }
 
     Scaffold(
@@ -137,19 +159,13 @@ fun MainPage(
                         horizontalArrangement = Arrangement.SpaceEvenly
                     ){
                         IconButton(
-                            onClick = { /*TODO*/ }
+                            onClick = {
+                                (context as? Activity)?.finishAffinity()
+                            }
                         ) {
                             Icon(
                                 Icons.Filled.Close,
                                 contentDescription = "Search"
-                            )
-                        }
-                        IconButton(
-                            onClick = { /*TODO*/ }
-                        ) {
-                            Icon(
-                                Icons.Filled.Home,
-                                contentDescription = "Home"
                             )
                         }
                         IconButton(
@@ -186,12 +202,39 @@ fun MainPage(
                     fontSize = 35.sp,
                     fontWeight = FontWeight.Bold
                 )
-                LazyColumn(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(start = 5.dp, top = 15.dp, end = 5.dp)
-                ) {
-                    if(articulos != null){
+
+                if(articulos.isNotEmpty()){
+                    articulos = articulos.filter {
+                        it.title != "[Removed]"
+                    }.onEach { item ->
+                        if(item.author == null){
+                            item.author = "No author"
+                        }
+                        if(item.title == null){
+                            item.title = "Title not found"
+                        }
+                        if(item.description == null){
+                            item.description = "Description not found"
+                        }
+                        if (item.url == null){
+                            item.url = "url not found"
+                        }
+                        if(item.content == null){
+                            item.content = "Content not found"
+                        }
+                        if(item.publishedAt == null){
+                            item.publishedAt = "Date not found"
+                        }
+                        if(item.urlToImage == null){
+                            item.urlToImage = stringResource(id = R.string.errorImageNoFound)
+                        }
+                    }
+
+                    LazyColumn(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(start = 5.dp, top = 15.dp, end = 5.dp)
+                    ) {
                         items(articulos){
                                 item ->
                             ElevatedCard(
@@ -242,9 +285,23 @@ fun MainPage(
                             Spacer(modifier = Modifier.height(15.dp))
 
                         }
-
                     }
                 }
+                else{
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(bottom = innerPadding.calculateBottomPadding()),
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        Text(
+                            modifier = Modifier.fillMaxWidth(),
+                            text = "No hay noticias que mostrar",
+                            textAlign = TextAlign.Center
+                        )
+                    }
+                }
+
 
 
             }
@@ -283,6 +340,6 @@ fun MainPagePreview(){
             )
         )
 
-        MainPage(response, rememberNavController())
+        MainPage(response, null, rememberNavController())
     }
 }
