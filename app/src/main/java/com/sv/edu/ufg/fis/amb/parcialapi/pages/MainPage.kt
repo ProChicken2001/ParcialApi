@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Context
 import android.util.Log
 import android.widget.Space
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -100,6 +101,42 @@ fun MainPage(
 
     LaunchedEffect(response) {
         articulos = response?.articles ?: emptyList()
+    }
+
+    LaunchedEffect(Unit) {
+        while (true){
+            val apiResponse = withContext(Dispatchers.IO){
+                delay(60_000)
+                if(request != null){
+                    RetrofitConfig.api
+                        .getNews(
+                            q = request.q,
+                            from = request.from,
+                            to = request.to,
+                            language = if(request.language == "") "es" else request.language,
+                            apiKey = getString(context, R.string.apiKey)
+                        )
+                }else{
+                    RetrofitConfig.api
+                        .getNews(
+                            q = "news",
+                            language = "es",
+                            apiKey = getString(context, R.string.apiKey)
+                        )
+                }
+            }
+
+            if(apiResponse.isSuccessful){
+                apiResponse.body()?.let {
+                    newResponse = it
+                }
+
+                articulos = newResponse?.articles ?: emptyList()
+            }
+
+            Toast.makeText(context, "DATOS ACTUALIZADOS", Toast.LENGTH_SHORT).show()
+
+        }
     }
 
     if(pullState.isRefreshing){
